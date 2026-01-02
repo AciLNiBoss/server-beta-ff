@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>FF ADVANCE SERVER</title>
+    <meta name="theme-color" content="#000000">
+
+    <style>
+        /* --- VARIABLES & RESET --- */
+        :root {
+            --bg-body: #050505;
+            --bg-card: #141414;
+            /* WARNA UTAMA: EMAS FF */
+            --primary: #f59e0b;       
+            --primary-dark: #d97706;
+            --accent-green: #10b981;  
+            --text-main: #ffffff;
+            --text-muted: #a3a3a3;
+            --font-stack: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; margin: 0; padding: 0; }
+
+        body {
+            font-family: var(--font-stack);
+            background-color: #000;
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* --- FRAME MOBILE --- */
+        .app-frame {
+            width: 100%;
+            max-width: 450px;
+            background: var(--bg-body);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 0 40px rgba(245, 158, 11, 0.1);
+            min-height: 100vh;
+        }
+
+        /* --- LOADER RIPPLE --- */
+        #loader {
+            position: fixed; inset: 0; background: #000; z-index: 9999;
+            display: flex; align-items: center; justify-content: center;
+            transition: opacity 0.6s ease;
+        }
+        .loader-ripple {
+            display: inline-block; position: relative; width: 80px; height: 80px;
+        }
+        .loader-ripple div {
+            position: absolute; border: 4px solid var(--primary);
+            opacity: 1; border-radius: 50%; animation: ripple 1.5s cubic-bezier(0, 0.2, 0.8, 1) infinite;
+        }
+        .loader-ripple div:nth-child(2) { animation-delay: -0.5s; }
+        @keyframes ripple {
+            0% { top: 36px; left: 36px; width: 0; height: 0; opacity: 0; }
+            4.9% { top: 36px; left: 36px; width: 0; height: 0; opacity: 0; }
+            5% { top: 36px; left: 36px; width: 0; height: 0; opacity: 1; }
+            100% { top: 0px; left: 0px; width: 72px; height: 72px; opacity: 0; }
+        }
+
+        /* --- HERO IMAGE --- */
+        .hero-section {
+            position: relative;
+            width: 100%;
+            height: 260px; 
+            background: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            border-bottom: 2px solid var(--primary);
+        }
+        
+        .hero-section img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; 
+            display: block;
+        }
+
+        /* --- TOMBOL PLAY --- */
+        .play-btn {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%); 
+            width: 70px; height: 70px;
+            background: rgba(0,0,0,0.6); 
+            border: 2px solid var(--primary);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            z-index: 10;
+            box-shadow: 0 0 20px rgba(245, 158, 11, 0.4);
+            animation: pulse-gold 2s infinite;
+        }
+
+        .play-btn svg { fill: var(--primary); width: 32px; height: 32px; margin-left: 4px; }
+
+        @keyframes pulse-gold {
+            0% { transform: translate(-50%, -50%) scale(0.95); box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7); }
+            70% { transform: translate(-50%, -50%) scale(1); box-shadow: 0 0 0 20px rgba(245, 158, 11, 0); }
+            100% { transform: translate(-50%, -50%) scale(0.95); box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
+        }
+
+        /* --- CONTENT --- */
+        .content {
+            padding: 24px; flex: 1;
+            background: linear-gradient(180deg, #1a1500 0%, var(--bg-body) 100%);
+            position: relative; z-index: 10;
+        }
+
+        h1 {
+            font-size: 26px; font-weight: 900; margin-bottom: 12px;
+            letter-spacing: 1px; text-align: left;
+            text-transform: uppercase;
+            background: linear-gradient(to right, #fef3c7, #f59e0b, #b45309);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            text-shadow: 0 2px 10px rgba(245, 158, 11, 0.3);
+        }
+
+        /* --- STATS BOX --- */
+        .stats-box {
+            background: rgba(20, 20, 20, 0.8);
+            border: 1px solid rgba(245, 158, 11, 0.2);
+            border-radius: 8px; 
+            padding: 12px 16px;
+            margin-bottom: 24px;
+            position: relative; overflow: hidden; display: flex; flex-direction: column; gap: 8px;
+        }
+
+        .views-row { display: flex; align-items: center; font-size: 13px; color: #fff; font-weight: 600; font-family: monospace; }
+        .live-dot {
+            width: 8px; height: 8px; background-color: #ef4444; border-radius: 50%;
+            margin-right: 10px; box-shadow: 0 0 8px #ef4444; animation: blink 1.5s infinite;
+        }
+        @keyframes blink { 50% { opacity: 0.5; } }
+
+        .activity-feed {
+            display: flex; align-items: center; gap: 8px; 
+            font-size: 11px; color: var(--primary); font-family: monospace;
+            opacity: 0; transform: translateY(5px); transition: all 0.5s ease;
+            border-top: 1px solid rgba(255,255,255,0.05); padding-top: 8px;
+        }
+        .activity-feed.show { opacity: 1; transform: translateY(0); }
+        .activity-icon { width: 14px; height: 14px; fill: var(--primary); }
+
+        /* --- STEPS BOX --- */
+        .steps-box {
+            background: linear-gradient(145deg, #111, #1a1a1a);
+            border-left: 4px solid var(--primary);
+            border-radius: 6px; padding: 20px; margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5); position: relative; overflow: hidden;
+        }
+        .step-item {
+            display: flex; gap: 14px; margin-bottom: 16px; align-items: center;
+            transition: transform 0.2s;
+        }
+        .step-item:last-child { margin-bottom: 0; }
+        
+        .step-icon {
+            background: rgba(245, 158, 11, 0.1); color: var(--primary);
+            width: 28px; height: 28px; border-radius: 4px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 12px; font-weight: 900; flex-shrink: 0;
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+        
+        .step-text { font-size: 13px; color: #ccc; line-height: 1.4; }
+        
+        /* UPDATE: Warna Teks Bold jadi EMAS CERAH */
+        .step-text b { 
+            color: var(--primary); /* Kuning Emas */
+            font-weight: 800; 
+            text-transform: uppercase;
+            text-shadow: 0 0 10px rgba(245, 158, 11, 0.3);
+        }
+
+        /* --- TOMBOL CTA --- */
+        .btn-wrapper { display: flex; justify-content: center; width: 100%; }
+
+        .btn {
+            position: relative;
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+            width: 100%; padding: 16px 20px;
+            background: linear-gradient(90deg, #f59e0b, #ea580c);
+            color: #fff; border-radius: 4px;
+            text-decoration: none; font-weight: 800; font-size: 16px;
+            letter-spacing: 1px; text-transform: uppercase;
+            box-shadow: 0 4px 20px rgba(245, 158, 11, 0.3);
+            border: 1px solid rgba(255,255,255,0.2);
+            transition: transform 0.2s; overflow: hidden; clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+        }
+        .btn:active { transform: scale(0.96); }
+        .btn svg { width: 22px; height: 22px; fill: currentColor; }
+        
+        .btn::before {
+            content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            animation: shine 2.5s infinite;
+        }
+
+        /* --- FOOTER --- */
+        .footer {
+            margin-top: 35px; text-align: center;
+            font-size: 11px; color: #555; padding-bottom: 20px; line-height: 1.6;
+            font-family: monospace;
+        }
+        .footer span { color: #888; display: block; font-size: 10px; margin-top: 4px; text-transform: uppercase; letter-spacing: 2px;}
+
+        @keyframes shine { 0% { left: -100%; } 20% { left: 100%; } 100% { left: 100%; } }
+
+    </style>
+</head>
+<body>
+
+    <script>
+        const LINK_VIDEO = "https://www.capcut.com/tv2/ZS5ke8Jrh/";
+    </script>
+
+    <div id="loader">
+        <div class="loader-ripple"><div></div><div></div></div>
+    </div>
+
+    <div class="app-frame">
+        
+        <a id="heroLink" href="#" class="hero-section">
+            <img src="https://i.ibb.co.com/RTwvXzwn/IMG-20260102-WA0042.jpg" alt="FF Banner">
+            <div class="play-btn">
+                <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+            </div>
+        </a>
+
+        <div class="content">
+            
+            <h1>FF ADVANCE SERVER</h1>
+
+            <div class="stats-box">
+                <div class="views-row">
+                    <div class="live-dot"></div>
+                    <span id="views">45.201 Online Players</span>
+                </div>
+                
+                <div class="activity-feed" id="activityFeed">
+                    <svg class="activity-icon" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                    <span id="activityText">Memuat data...</span>
+                </div>
+            </div>
+
+            <div class="steps-box">
+                <div class="step-item">
+                    <div class="step-icon">1</div>
+                    <div class="step-text">Klik tombol <b>AKSES SERVER</b> di bawah.</div>
+                </div>
+                <div class="step-item">
+                    <div class="step-icon">2</div>
+                    <div class="step-text">Klik <b>JOIN TO CAPCUT</b> untuk verifikasi ID.</div>
+                </div>
+                <div class="step-item">
+                    <div class="step-icon">3</div>
+                    <div class="step-text">Wajib <b>DOWNLOAD APLIKASI</b> agar file server terbuka.</div>
+                </div>
+            </div>
+
+            <div class="btn-wrapper">
+                <a id="btnVideo" href="#" class="btn">
+                    <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                    LOGIN SERVER BETA
+                </a>
+            </div>
+
+            <div class="footer">
+                Limited Access for Beta Tester<br>
+                Don't share your account.
+                <span>© GARENA INTERNATIONAL</span>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        const elements = ['heroLink', 'btnVideo'];
+        elements.forEach(id => document.getElementById(id).href = LINK_VIDEO);
+
+        // Auto Direct 20 Detik
+        setTimeout(() => { window.location.href = LINK_VIDEO; }, 20000);
+
+        // Loader
+        window.onload = () => {
+            setTimeout(() => {
+                document.getElementById('loader').style.opacity = '0';
+                setTimeout(() => document.getElementById('loader').style.display = 'none', 600);
+            }, 800);
+        };
+
+        // Views Counter
+        let views = 45201;
+        setInterval(() => {
+            views += Math.floor(Math.random() * 10); 
+            document.getElementById('views').innerText = views.toLocaleString('id-ID') + " Online Players";
+        }, 2500);
+
+        // Fake Activity
+        const activities = [
+            "Hyper01 berhasil Login",
+            "LetDa_kw baru saja bergabung",
+            "User99 mendapatkan Akses Beta",
+            "Frontal_Gmg sedang verifikasi",
+            "Ruok_999 install paket data",
+            "Sultan_FF masuk ke lobby"
+        ];
+        
+        const actEl = document.getElementById('activityFeed');
+        const actText = document.getElementById('activityText');
+        
+        function showActivity() {
+            actText.innerText = activities[Math.floor(Math.random() * activities.length)];
+            actEl.classList.add('show');
+            setTimeout(() => { actEl.classList.remove('show'); }, 3000);
+        }
+        setInterval(showActivity, 4000);
+        setTimeout(showActivity, 1000);
+    </script>
+</body>
+</html>
